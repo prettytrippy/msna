@@ -4,4 +4,5 @@ __pycache__/
 */.DS_Store
 */.ipynb_checkpoints
 MSNA.zip
-msna/msna.egg-info
+msna.egg-info
+test.py

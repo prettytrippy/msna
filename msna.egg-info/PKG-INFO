@@ -10,6 +10,12 @@ Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6, <3.13
 Description-Content-Type: text/markdown
 Requires-Dist: numpy<1.27,>=1.26
+Requires-Dist: torch<=2.5.1,>2.5.0
+Requires-Dist: scipy<=1.15.2,>1.15.0
+Requires-Dist: pandas<=2.2.3,>2.2.0
+Requires-Dist: tqdm<=4.67.1,>4.67.0
+Requires-Dist: scikit-learn<=1.6.1,>1.6.0
+Requires-Dist: matplotlib<=3.10.0,>=3.10.0
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier

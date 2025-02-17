@@ -1,20 +1,14 @@
-from msna_cnn import MSNA_CNN
-from msna_common import read_msna, metrics, training_metrics
-import pandas as pd
+from msna.msna_cnn import MSNA_CNN
+from msna.msna_common import read_msna, metrics, training_metrics
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
-import glob
 import json
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt, medfilt, find_peaks
-from scipy.optimize import minimize, differential_evolution
-from scipy.ndimage import maximum_filter
+from scipy.signal import butter, filtfilt, medfilt
+from scipy.optimize import differential_evolution
 
 # TODO: Add downsampling to get signals in a fixed sampling rate
 
