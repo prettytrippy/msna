@@ -1,0 +1,20 @@
+Metadata-Version: 2.2
+Name: msna
+Version: 0.1.0
+Summary: Code for the paper "A Robust Deep Learning Framework for Detecting Bursts in Muscle Sympathetic Nerve Activity"
+Home-page: https://github.com/prettytrippy/MSNA
+Author: Richard Dow
+Author-email: trippdow@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6, <3.13
+Description-Content-Type: text/markdown
+Requires-Dist: numpy<1.27,>=1.26
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
