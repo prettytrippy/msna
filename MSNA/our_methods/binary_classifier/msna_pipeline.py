@@ -1,27 +1,21 @@
-from msna_cnn_no_ECG import MSNA_CNN
-from msna_common import read_msna, metrics, training_metrics
-import pandas as pd
+from msna.our_methods.binary_classifier.msna_cnn import MSNA_CNN
+from msna.msna_common import read_msna, metrics, training_metrics
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
-import glob
 import json
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-from scipy.signal import butter, filtfilt, medfilt, find_peaks
-from scipy.optimize import minimize, differential_evolution
-from scipy.ndimage import maximum_filter
+from scipy.signal import butter, filtfilt, medfilt
+from scipy.optimize import differential_evolution
 
 # TODO: Add downsampling to get signals in a fixed sampling rate
 
 class MSNA_pipeline():
     
     def __init__(self, sampling_rate=250, window_size=256, batch_size=1024, verbose=True, fc_dim=32, dropout_prob=0.5, 
-                 argmax_prop=0.1, training_imbalance=0.5, rectify_prop=0.1, high_freq=0.25, low_freq=30.0):
+                 argmax_prop=0.5, training_imbalance=2.0, rectify_prop=0.5, high_freq=35.0, low_freq=0.5, kernel_size=7):
         self.verbose = verbose
         self.sr = sampling_rate
         self.window_size = window_size
@@ -33,11 +27,12 @@ class MSNA_pipeline():
         self.rectify_prop = rectify_prop
         self.low_freq = low_freq
         self.high_freq = high_freq
+        self.kernel_size = kernel_size
 
         self.init_params()
 
     def init_params(self):
-        self.cnn = MSNA_CNN(n=self.window_size, dropout_prob=self.dropout_prob, fc_dim=self.fc_dim)
+        self.cnn = MSNA_CNN(n=self.window_size, kernel_size=self.kernel_size, dropout_prob=self.dropout_prob, fc_dim=self.fc_dim)
         self.threshold = 0.90
 
     def save(self, output_folder):
@@ -80,10 +75,10 @@ class MSNA_pipeline():
         df['ECG'] = medfilt(df['ECG'], 3)
         
         df['band-pass MSNA'] = self.band_pass_filter(df['Integrated MSNA'], low_cutoff, high_cutoff, fs)
-        # df['band-pass ECG'] = self.band_pass_filter(df['ECG'], low_cutoff, high_cutoff, fs)
+        df['band-pass ECG'] = self.band_pass_filter(df['ECG'], low_cutoff, high_cutoff, fs)
 
         df['normalized MSNA'] = self.median_normalize(df['band-pass MSNA'])
-        # df['normalized ECG'] = self.median_normalize(df['band-pass ECG'])
+        df['normalized ECG'] = self.median_normalize(df['band-pass ECG'])
         # df['normalized MSNA'] = self.median_normalize(df['Integrated MSNA'])
         # df['normalized ECG'] = self.median_normalize(df['ECG'])
 
@@ -116,12 +111,12 @@ class MSNA_pipeline():
         n = self.window_size
         
         msna = df['normalized MSNA'].to_numpy()
-        # ecg = df['normalized ECG'].to_numpy()
+        ecg = df['normalized ECG'].to_numpy()
         burst_labels = df['BURST'].to_numpy()
 
         indices = self.find_peaks(msna)
         chunks = [
-                [torch.tensor(msna[idx-n//2: idx+n//2]), 
+                [torch.tensor(np.array([msna[idx-n//2: idx+n//2], ecg[idx-n//2: idx+n//2]])), 
                 int(1 in burst_labels[idx-n//2: idx+n//2])]
             for idx in indices
         ]
@@ -130,6 +125,7 @@ class MSNA_pipeline():
 
     def chunk_df(self, df):
         msna = df['normalized MSNA'].to_numpy()
+        ecg  = df['normalized ECG'].to_numpy()
         burst = df['rectified BURST'].to_numpy()
         length = len(df)
         half_w = self.window_size // 2
@@ -150,8 +146,9 @@ class MSNA_pipeline():
                 continue
             # Slice
             msna_chunk = msna[start:end]
+            ecg_chunk  = ecg[start:end]
     
-            x = torch.tensor(msna_chunk)
+            x = torch.tensor(np.stack([msna_chunk, ecg_chunk], axis=0))
             pos_chunks.append((x, 1))
 
         # 3) Negative windows
@@ -181,10 +178,11 @@ class MSNA_pipeline():
                 continue
                 
             msna_chunk = msna[start:end]
+            ecg_chunk  = ecg[start:end]
     
             # (Optional) Data augmentation: noise, scaling, etc.
     
-            x = torch.tensor(msna_chunk)
+            x = torch.tensor(np.stack([msna_chunk, ecg_chunk], axis=0))
             neg_chunks.append((x, 0))
     
         # 4) Combine, shuffle, return
@@ -211,7 +209,7 @@ class MSNA_pipeline():
             for inputs, labels in trainloader:
                 # Forward
                 optimizer.zero_grad()
-                outputs = self.cnn(inputs.float().unsqueeze(1))
+                outputs = self.cnn(inputs.float())
                 # outputs = self.cnn(inputs.float().squeeze().unsqueeze(1))
                 
                 # Backward
@@ -270,6 +268,7 @@ class MSNA_pipeline():
         n = self.window_size
         
         msna = df['normalized MSNA'].to_numpy()
+        ecg = df['normalized ECG'].to_numpy()
         
         idxs = self.find_peaks(msna)
         
@@ -277,7 +276,7 @@ class MSNA_pipeline():
             start = idx - n//2
             end = idx + n//2
         
-            chunk = msna[start:end]
+            chunk = [msna[start:end], ecg[start:end]]
             
             chunks.append(chunk)
     
@@ -309,7 +308,7 @@ class MSNA_pipeline():
         # Run the model to get output probabilities
         model_input = torch.tensor(chunks)
         with torch.no_grad():
-            probabilities = self.cnn(model_input.float().unsqueeze(1)).detach()
+            probabilities = self.cnn(model_input.float()).detach()
         probabilities = probabilities.numpy().squeeze()
 
         return probabilities, possible_peak_indices
@@ -355,7 +354,7 @@ class MSNA_pipeline():
         if self.verbose:
             print("Threshold result:", result)
             
-    def train(self, filenames, threshold_train_max_iter=32, learning_rate=0.001, num_epochs=32):
+    def train(self, filenames, threshold_train_max_iter=32, learning_rate=0.001, num_epochs=16):
         if self.verbose:
             print("Processing dataframes.")
 

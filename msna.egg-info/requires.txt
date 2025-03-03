@@ -1,7 +1,7 @@
-numpy<1.27,>=1.26
-torch<=2.5.1,>2.5.0
-scipy<=1.15.2,>1.15.0
-pandas<=2.2.3,>2.2.0
-tqdm<=4.67.1,>4.67.0
-scikit-learn<=1.6.1,>1.6.0
-matplotlib<=3.10.0,>=3.10.0
+matplotlib
+numpy
+pandas
+scikit-learn
+scipy
+torch
+tqdm

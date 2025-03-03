@@ -59,15 +59,20 @@ def read_msna(file_path):
                 respiratory_rate = parts[12]
                 filter_other = parts[13]
                 percent_mvc = parts[14]
+                flag = parts[15]
+                channel_17 = parts[16]
+                mabp = parts[17]
                 
-                data.append([timestamp, ecg, nibp, raw_msna, integrated_msna, burst_flag])
+                data.append([timestamp, ecg, nibp, handgrip, respiratory_waveform, systolic, diastolic, heart_rate, raw_msna, stimulator, filtered_msna, integrated_msna, respiratory_rate, filter_other, percent_mvc, percent_mvc, flag, channel_17, mabp, burst_flag])
     
         if not channel_titles:
             print("Error: Channel titles were not found in the metadata.")
             return None
       
         # Convert to DataFrame
-        new_channels = ['Timestamp', 'ECG', 'NIBP', 'Raw MSNA', 'Integrated MSNA', 'BURST']
+        # new_channels = ['Timestamp', 'ECG', 'NIBP', 'Raw MSNA', 'Integrated MSNA', 'BURST']
+        new_channels = ['Timestamp', "ECG",	'NIBP', 'Handgrip', 'Respiratory Waveform', 'Systolic', 'Diastolic', 'HR', 'Raw MSNA', 'Stimulator', 'Filtered MSNA', 'Integrated MSNA', 'Respiratory Rate', 'Filter MSNA other', '%MVC', '%MVC smoothed', 'FLAG', 'Channel 17', 'Mean Arterial BP', 'BURST']
+
         df = pd.DataFrame(data, columns=new_channels)
         df = df.apply(pd.to_numeric, errors='coerce')
     
