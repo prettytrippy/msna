@@ -1,4 +1,3 @@
-from msna_cnn import MSNA_CNN
 from msna_common import read_msna, metrics, training_metrics
 import pandas as pd
 import numpy as np

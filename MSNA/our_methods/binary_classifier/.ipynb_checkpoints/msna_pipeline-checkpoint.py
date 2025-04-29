@@ -245,8 +245,7 @@ class MSNA_pipeline():
             return []
         windows = sliding_window_view(arr, window_size)
         relative_indices = np.argmax(windows, axis=1)
-        absolute_indices = np.arange(len(relative_indices)) 
-        absolute_indices += relative_indices
+        absolute_indices = np.arange(len(relative_indices)) + relative_indices
         return absolute_indices
 
     def find_peaks(self, signal):

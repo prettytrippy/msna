@@ -1,9 +1,19 @@
 from msna.our_methods.binary_classifier.msna_pipeline import MSNA_pipeline
 from msna.msna_common import read_msna
 import numpy as np
+import os
  
+def get_app_path(directory):
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    package_dir = package_dir[:-5]
+    storage_dir = os.path.join(package_dir, directory)
+    os.makedirs(storage_dir, exist_ok=True)
+    return storage_dir
+
+directory = get_app_path("msna")
+
 pipeline = MSNA_pipeline(sampling_rate=250, verbose=True)
-pipeline.load("msna/our_methods/binary_classifier/pretrained")
+pipeline.load(f"{directory}/our_methods/binary_classifier/pretrained")
 
 predict = pipeline.predict
 
