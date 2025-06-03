@@ -2,7 +2,7 @@ __pycache__/
 */__pycache__/
 .DS_Store
 */.DS_Store
-/*/.ipynb_checkpoints
+*/.ipynb_checkpoints
 MSNA.zip
 msna.egg-info/
 test.py
