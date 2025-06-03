@@ -53,6 +53,8 @@ def write_bursts(infile, outfile):
 
     df['Predicted BURST'] = predicted_col
     create_labchart_file(outfile, get_metadata_string(infile), df)
+    
+    return df
 
 __all__ = ["predict", "write_bursts"]
 
