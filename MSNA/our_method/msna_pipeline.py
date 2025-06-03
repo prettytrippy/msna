@@ -1,4 +1,4 @@
-from msna.our_methods.binary_classifier.msna_cnn import MSNA_CNN
+from msna.our_method.msna_cnn import MSNA_CNN
 from msna.msna_common import read_msna, metrics, training_metrics, histogram_normalize
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view

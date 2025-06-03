@@ -16,8 +16,8 @@ setup(
     description='Code for the paper "A Robust Deep Learning Framework for Detecting Bursts in Muscle Sympathetic Nerve Activity"',
     long_description=open("README.md", "r").read(),
     long_description_content_type='text/markdown',
-    url='https://github.com/prettytrippy/MSNA',
-    author='Richard Dow',
+    url='https://github.com/prettytrippy/msna',
+    author='Tripp Dow',
     author_email='trippdow@gmail.com',
     classifiers=[
         'Programming Language :: Python :: 3',

@@ -13,7 +13,7 @@ def get_app_path(directory):
 directory = get_app_path("msna")
 
 pipeline = MSNA_pipeline(sampling_rate=250, verbose=True)
-pipeline.load(f"{directory}/our_method/pretrained")
+pipeline.load(f"{directory}/our_methods/binary_classifier/pretrained")
 
 predict = pipeline.predict
 
@@ -59,4 +59,4 @@ def write_bursts(infile, outfile):
 __all__ = ["predict", "write_bursts"]
 
 __version__ = "0.1.0"
-__author__ = "Tripp Dow"
+__author__ = "Richard Dow"

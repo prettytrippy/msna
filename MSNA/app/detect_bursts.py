@@ -11,13 +11,7 @@ if __name__ == "__main__":
     filename = filedialog.askopenfilename(title="Select Data File")
     directory = filedialog.askdirectory(title="Select Destination Folder")
 
-    if not directory:
-        directory = open("directory.txt", 'r').read()
-    else:
-        with open("directory.txt", 'w') as file:
-            file.write(directory)
-
-    if filename:
+    if filename and directory:
         print(f"\nAutomatically detecting bursts in file {filename}")
 
         outfile = directory + "/" + process_filename(filename) + "_PREDICTED_BURSTS.txt"

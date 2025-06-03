@@ -1,5 +1,5 @@
-from msna.our_methods.binary_classifier.msna_cnn_no_ECG import MSNA_CNN
-from msna_common import read_msna, metrics, training_metrics
+from msna.our_method.msna_cnn_no_ECG import MSNA_CNN
+from msna.msna_common import read_msna, metrics, training_metrics
 import pandas as pd
 import numpy as np
 from numpy.lib.stride_tricks import sliding_window_view
