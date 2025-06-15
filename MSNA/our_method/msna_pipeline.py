@@ -409,7 +409,7 @@ class MSNA_pipeline():
     def split_data(self, data, k):
         length = len(data) // k
         splits = []
-        for i in range(k-1):
+        for i in range(k):
             chunk = data[i*length:(i+1)*length]
             if type(data) != list: # Handle intrasubject Dataframe chunks
                 chunk = [chunk]
@@ -417,7 +417,7 @@ class MSNA_pipeline():
         return splits
         
     def k_fold_cross_validation(self, filenames, k):
-        k += 1
+        # k += 1
         splits = self.split_data(filenames, k)
 
         n = len(splits)
@@ -449,20 +449,23 @@ class MSNA_pipeline():
             precision, recall, f1 = 0, 0, 0
             for i in test_sample:
                 new_precision, new_recall, new_f1 = metrics(self, i, verbose=False)
-                precision += new_precision
-                recall += new_recall
-                f1 += new_f1
+                # precision += new_precision
+                # recall += new_recall
+                # f1 += new_f1
+                f1s.append(new_f1)
+                precisions.append(new_precision)
+                recalls.append(new_recall)
                 
-            f1 /= len(test_sample)
-            recall /= len(test_sample)
-            precision /= len(test_sample) 
+            # f1 /= len(test_sample)
+            # recall /= len(test_sample)
+            # precision /= len(test_sample) 
             
-            f1s.append(f1)
-            precisions.append(precision)
-            recalls.append(recall)
+            # f1s.append(f1)
+            # precisions.append(precision)
+            # recalls.append(recall)
 
-            if self.verbose:
-                print(f"F1 for split {idx+1}: {f1}")
+            # if self.verbose:
+            #     print(f"F1 for split {idx+1}: {f1}")
 
             # if self.verbose:
             #     print("Current Threshold:", self.threshold)
