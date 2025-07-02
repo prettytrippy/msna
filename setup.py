@@ -9,7 +9,7 @@ setup(
         "numpy",
         "pandas",
         "scikit-learn",
-        "scipy",
+        "scipy==1.14.0",
         "torch",
         "tqdm",
     ],
